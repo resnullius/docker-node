@@ -7,6 +7,7 @@ Orchestrator script for docker-node's images.
 Usage:
   orchestrator build -t lts [-t stable]
   orchestrator update-keys -t lts [-t stable]
+  orchestrator push -t lts [-t stable]
   orchestrator --version
   orchestrator -h | --help
 
@@ -67,6 +68,15 @@ update_keys() {
   done
 }
 
+push() {
+  eval_build_opts "$@"
+  for tag in "${tags[@]}"; do
+    echo "pushing tag $tag..."
+    docker push resnullius/node:"$tag"
+    docker push resnullius/node:"$tag"-build
+  done
+}
+
 version() {
   echo "$version"
 }
@@ -81,6 +91,7 @@ main() {
   case "$cmd" in
     build)              shift; build "$@";;
     update-keys)        shift; update_keys "$@";;
+    push)               shift; push "$@";;
     -h|--help)          shift; help "$@";;
     --version)          shift; version;;
     *)                  help "$@";;
