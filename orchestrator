@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+# vim: ft=sh tw=80
+
+declare help="
+Orchestrator script for docker-node's images.
+
+Usage:
+  orchestrator build -t lts [-t stable]
+  orchestrator update-keys -t lts [-t stable]
+  orchestrator --version
+  orchestrator -h | --help
+
+Options:
+  -t              Tag to work on, can be multiple.
+  -h --help       Show this screen.
+  --version       Show versions.
+"
+
+declare version="
+Version: 1.0.0.
+Licensed under the MIT terms.
+"
+
+declare ARCH
+ARCH="$(uname -m)"
+declare -a tags
+declare tag_dir
+
+eval_build_opts() {
+  while getopts ":t:" opt "$@"; do
+    case "$opt" in
+      t)    tags+=("$OPTARG");;
+      \?)   echo "Invalid option -$OPTARG was ignored." >&2;;
+      :)
+        echo "Option -$OPTARG requires an argument." >&2
+        exit 1;;
+    esac
+  done
+}
+
+clean_tag() {
+  tag_dir="$1"
+}
+
+compile() {
+  clean_tag "$1"
+
+  [ ! -d "$tag_dir" ] && echo "No tag named $tag_dir" && exit 1
+
+  docker build -t resnullius/node:"$tag_dir" "$tag_dir"/lite
+  docker build -t resnullius/node:"$tag_dir"-build "$tag_dir"/build
+}
+
+build() {
+  eval_build_opts "$@"
+  for tag in "${tags[@]}"; do
+    compile "$tag"
+  done
+}
+
+update_keys() {
+  eval_build_opts "$@"
+  for tag in "${tags[@]}"; do
+    echo "copying keys to $tag"
+    [ ! -d "$tag"/lite/keys ] && mkdir "$tag"/lite/keys
+    cp misc/*.pub "$tag"/lite/keys
+  done
+}
+
+version() {
+  echo "$version"
+}
+
+help() {
+  echo "$help"
+}
+
+main() {
+  set -eo pipefail; [[ "$TRACE" ]] && set -x
+  declare cmd="$1"
+  case "$cmd" in
+    build)              shift; build "$@";;
+    update-keys)        shift; update_keys "$@";;
+    -h|--help)          shift; help "$@";;
+    --version)          shift; version;;
+    *)                  help "$@";;
+  esac
+}
+
+main "$@"
