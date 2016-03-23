@@ -8,10 +8,10 @@ Docker images for node using `resnullius/alpine:latest` for `lts` and `stable`.
 
 Expect:
 
-- `resnullius/docker:lts`
-- `resnullius/docker:lts-build`
-- `resnullius/docker:stable`
-- `resnullius/docker:stable-build`
+- `resnullius/node:lts`
+- `resnullius/node:lts-build`
+- `resnullius/node:stable`
+- `resnullius/node:stable-build`
 
 The `-build` means it has the packages for building C++ addons; the non `-build`
 is smaller but can only install native modules.
