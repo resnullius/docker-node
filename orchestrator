@@ -5,9 +5,9 @@ declare help="
 Orchestrator script for docker-node's images.
 
 Usage:
-  orchestrator build -t lts [-t stable]
-  orchestrator update-keys -t lts [-t stable]
-  orchestrator push -t lts [-t stable]
+  orchestrator build -t lts [-t current]
+  orchestrator update-keys -t lts [-t current]
+  orchestrator push -t lts [-t current]
   orchestrator --version
   orchestrator -h | --help
 
